@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Resume Processing System</title>
+    <link rel="stylesheet" type="text/css" href="../static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Upload Your Resume</h1>
+        <form id="uploadForm" enctype="multipart/form-data" action="/api/upload-resume" method="POST">
+        <input type="file" name="file" id="resume" accept=".pdf">
+            <br>
+        <input type="text" name="job_requirements" id="jobRequirements" placeholder="Enter job requirements or skills">
+        <button type="submit">Process Resume</button>
+        </form>
+
+    </div>
+
+    <div class="result-container" id="resultContainer" style="display:none;">
+        <h2>Candidate Evaluation According to </h2>
+        <h2>Resume vs Job Requirements</h2>
+        <p>Similarity: <span id="similarity"></span></p>
+        <a href="#" id="backToUpload">Back to Upload</a>
+    </div>
+
+    <script>
+        const uploadForm = document.getElementById('uploadForm');
+        const resultContainer = document.getElementById('resultContainer');
+        const similarityElement = document.getElementById('similarity');
+        const backToUpload = document.getElementById('backToUpload');
+
+        uploadForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const formData = new FormData(uploadForm);
+
+            /*To connect to  Azure*/
+            /*fetch('/api/upload-resume' */
+                  
+fetch('https://resumecheckerapp.azurewebsites.net/api/upload-resume'), {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    similarityElement.textContent = data.similarity;
+                    uploadForm.style.display = 'none';
+                    resultContainer.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+
+        backToUpload.addEventListener('click', (event) => {
+            event.preventDefault();
+            uploadForm.style.display = 'block';
+            resultContainer.style.display = 'none';
+        });
+    </script>
+</body>
+</html>
